@@ -34,7 +34,7 @@ export default async function NextStep({
   const { token } = await searchParams;
   
   const TOTAL_STEPS = 7; 
-  const FINAL_LINK = "https://www.mediafire.com/YOUR_FILE_LINK"; 
+  const FINAL_LINK = "https://t.me/PaidFile_free_bot?start=BQADAQAD4BYAArrFyEa9q8cIinjoXBYE"; 
 
   // 1. Decrypt the token to find out which step they are really on
   // If no token, they are at Step 0
