@@ -13,7 +13,7 @@ export type Station = {
 };
 
 export async function getStations(): Promise<Station[]> {
-  const filePath = path.join(process.cwd(), 'data', 'stations.csv');
+  const filePath = path.join(process.cwd(), 'public', 'stations.csv');
   const fileContent = fs.readFileSync(filePath, 'utf8');
   
   const { data } = Papa.parse(fileContent, {
