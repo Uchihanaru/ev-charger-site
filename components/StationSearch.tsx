@@ -13,24 +13,21 @@ type Station = {
 
 export default function StationSearch({ stations }: { stations: Station[] }) {
   const [query, setQuery] = useState("");
-  const [visibleCount, setVisibleCount] = useState(24); // Start by showing only 24
+  const [visibleCount, setVisibleCount] = useState(24);
 
-  // Filter the stations based on search
   const filteredStations = stations.filter((station) => {
     const searchContent = (station['Station Name'] + station.City + station.State).toLowerCase();
     return searchContent.includes(query.toLowerCase());
   });
 
-  // The stations we actually show on screen (limited by visibleCount)
   const visibleStations = filteredStations.slice(0, visibleCount);
 
-  // Reset the "Load More" when someone searches
   useEffect(() => {
     setVisibleCount(24);
   }, [query]);
 
   const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + 24); // Load 24 more when clicked
+    setVisibleCount((prev) => prev + 24);
   };
 
   return (
@@ -50,7 +47,7 @@ export default function StationSearch({ stations }: { stations: Station[] }) {
           </p>
           
           {/* SEARCH BAR */}
-          <div className="bg-white p-1.5 rounded-full max-w-lg mx-auto flex shadow-xl">
+          <div className="bg-white p-1.5 rounded-full max-w-lg mx-auto flex shadow-xl mb-8">
             <input 
               type="text" 
               placeholder="City (e.g. Austin)..." 
@@ -62,6 +59,10 @@ export default function StationSearch({ stations }: { stations: Station[] }) {
               Search
             </button>
           </div>
+
+          {/* 👇👇👇 STEP 4: THE DOWNLOAD BUTTON 👇👇👇 */}
+                    {/* 👆👆👆 END BUTTON 👆👆👆 */}
+
         </div>
       </div>
 
@@ -111,7 +112,6 @@ export default function StationSearch({ stations }: { stations: Station[] }) {
               ))}
             </div>
 
-            {/* LOAD MORE BUTTON */}
             {visibleCount < filteredStations.length && (
               <div className="mt-12 text-center">
                 <button 
@@ -120,9 +120,6 @@ export default function StationSearch({ stations }: { stations: Station[] }) {
                 >
                   Load More Stations ↓
                 </button>
-                <p className="text-xs text-slate-400 mt-3">
-                  Showing {visibleStations.length} out of {filteredStations.length} stations
-                </p>
               </div>
             )}
           </>

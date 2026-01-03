@@ -1,6 +1,8 @@
 import { getStations, getStationById } from '../../../lib/companies';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import AdBanner from '@/components/AdBanner'; // If you have manual ads
+import DownloadOverlay from '@/components/DownloadOverlay'; // <--- IMPORTING THE OVERLAY
 
 // --- AI CONTENT ENGINE ---
 function generateArticle(station: any) {
@@ -37,10 +39,13 @@ function generateArticle(station: any) {
 
 export async function generateStaticParams() {
   const stations = await getStations();
-  return stations.map((station) => ({
+  // Only build first 50 for speed, rest are on-demand
+  const topStations = stations.slice(0, 50); 
+  return topStations.map((station) => ({
     id: station.ID,
   }));
 }
+export const dynamicParams = true;
 
 export default async function StationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -53,7 +58,7 @@ export default async function StationPage({ params }: { params: Promise<{ id: st
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(station['Street Address'] + " " + station.City + " " + station.State)}`;
 
   return (
-    <main className="bg-slate-50 min-h-screen pb-24"> {/* Extra padding at bottom for sticky bar */}
+    <main className="bg-slate-50 min-h-screen pb-24">
       
       {/* HEADER BACKGROUND */}
       <div className="bg-slate-900 h-40 w-full absolute top-16 left-0 z-0"></div>
@@ -84,7 +89,7 @@ export default async function StationPage({ params }: { params: Promise<{ id: st
                 {station['Street Address']}, {station.City}, {station.State} {station.ZIP}
               </div>
 
-              {/* DESKTOP BUTTONS (Hidden on Mobile) */}
+              {/* DESKTOP BUTTONS */}
               <div className="hidden md:flex gap-4 mb-8">
                 <a 
                   href={googleMapsUrl}
@@ -121,17 +126,17 @@ export default async function StationPage({ params }: { params: Promise<{ id: st
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-6 text-center">
               <p className="text-xs text-slate-400 uppercase font-bold mb-2">Sponsored</p>
+              {/* If you have manual ads, they go here. Otherwise Auto Ads handles it */}
               <div className="h-40 bg-slate-200 rounded flex items-center justify-center text-slate-400 text-sm">
-                AdSense / Amazon
+                Ad Space
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* --- STICKY MOBILE DRIVER BAR --- */}
-      {/* This only shows on mobile screens at the bottom */}
-      <div className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 md:hidden z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex gap-3">
+      {/* STICKY MOBILE BAR */}
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 md:hidden z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex gap-3">
         <a 
           href={googleMapsUrl}
           target="_blank"
@@ -139,10 +144,11 @@ export default async function StationPage({ params }: { params: Promise<{ id: st
         >
           Navigate ↗
         </a>
-        <button className="bg-slate-100 text-slate-600 font-bold py-3 px-4 rounded-lg border border-slate-200">
-          Share
-        </button>
       </div>
+
+      {/* 👇 THIS IS THE MAGIC OVERLAY 👇 */}
+      {/* It sits on top of everything when the user is downloading */}
+      <DownloadOverlay />
 
     </main>
   );
