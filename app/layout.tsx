@@ -2,13 +2,17 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import AdSenseScript from "@/components/AdSenseScript"; // <--- Importing your ID script
+import AdSenseScript from "@/components/AdSenseScript";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "ChargeFinder US | EV Station Directory",
   description: "Find electric vehicle charging stations across the USA.",
+  // 👇 THIS IS THE MAGIC FIX FOR VERIFICATION 👇
+  other: {
+    "google-adsense-account": "ca-pub-6555002531671472",
+  },
 };
 
 export default function RootLayout({
@@ -19,9 +23,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-slate-50 text-slate-900`}>
-        <AdSenseScript /> {/* <--- Activating your ID here */}
+        {/* This script handles the Auto Ads logic */}
+        <AdSenseScript />
+        
         <Navbar />
+        
         {children}
+        
         <footer className="bg-slate-900 text-slate-400 py-12 mt-20">
           <div className="max-w-6xl mx-auto px-6 text-center">
             <p className="mb-4">© 2026 ChargeFinder US. All rights reserved.</p>
