@@ -18,6 +18,7 @@ export default function Navbar() {
         
         {/* DESKTOP MENU (Hidden on Mobile) */}
         <div className="hidden md:flex gap-6 text-sm font-medium text-slate-300">
+         <Link href="/blog" className="hover:text-white transition">Blog</Link>
           <Link href="/" className="hover:text-white transition">Home</Link>
           <a href="#locations" className="hover:text-white transition">Locations</a>
           <a href="https://www.google.com/maps/search/electric+vehicle+charging+station" target="_blank" className="hover:text-white transition">Map</a>
