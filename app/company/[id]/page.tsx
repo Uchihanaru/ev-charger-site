@@ -1,23 +1,28 @@
 import { getStations, getStationById } from '../../../lib/companies';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import AdBanner from '@/components/AdBanner'; // If you have manual ads
-import DownloadOverlay from '@/components/DownloadOverlay'; // <--- IMPORTING THE OVERLAY
+import AdBanner from '@/components/AdBanner';
+import DownloadOverlay from '@/components/DownloadOverlay';
+import { Suspense } from 'react'; // <--- 1. IMPORT SUSPENSE
 
 // --- AI CONTENT ENGINE ---
 function generateArticle(station: any) {
-  const city = station.City;
-  const state = station.State;
-  const name = station['Station Name'];
+  // Safety Check: If data is missing, use default text to prevent crash
+  const city = station.City || "Unknown City";
+  const state = station.State || "USA";
+  const name = station['Station Name'] || "EV Charging Station";
   const network = station['EV Network'] || "local charging networks";
-  const address = station['Street Address'];
+  const address = station['Street Address'] || "Address not available";
 
   const intros = [
     `As electric vehicle adoption continues to rise in ${city}, finding reliable charging infrastructure has never been more important.`,
     `For EV drivers traveling through ${state}, knowing where to stop is crucial. ${city} is becoming a key hub for green transportation.`,
     `Whether you are a local resident of ${city} or just passing through, keeping your battery full is essential.`
   ];
-  const randomIntro = intros[name.length % intros.length];
+  
+  // Safety Check: Ensure name exists before calculating length
+  const nameLength = name ? name.length : 5;
+  const randomIntro = intros[nameLength % intros.length];
 
   return (
     <article className="prose prose-slate lg:prose-lg mt-12 max-w-none mb-20">
@@ -39,7 +44,6 @@ function generateArticle(station: any) {
 
 export async function generateStaticParams() {
   const stations = await getStations();
-  // Only build first 50 for speed, rest are on-demand
   const topStations = stations.slice(0, 50); 
   return topStations.map((station) => ({
     id: station.ID,
@@ -55,7 +59,7 @@ export default async function StationPage({ params }: { params: Promise<{ id: st
     return notFound();
   }
 
-  const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(station['Street Address'] + " " + station.City + " " + station.State)}`;
+  const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent((station['Street Address'] || "") + " " + (station.City || "") + " " + (station.State || ""))}`;
 
   return (
     <main className="bg-slate-50 min-h-screen pb-24">
@@ -126,10 +130,8 @@ export default async function StationPage({ params }: { params: Promise<{ id: st
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-6 text-center">
               <p className="text-xs text-slate-400 uppercase font-bold mb-2">Sponsored</p>
-              {/* If you have manual ads, they go here. Otherwise Auto Ads handles it */}
-              <div className="h-40 bg-slate-200 rounded flex items-center justify-center text-slate-400 text-sm">
-                Ad Space
-              </div>
+              {/* MANUAL AD BANNER */}
+              <AdBanner />
             </div>
           </div>
         </div>
@@ -146,9 +148,10 @@ export default async function StationPage({ params }: { params: Promise<{ id: st
         </a>
       </div>
 
-      {/* 👇 THIS IS THE MAGIC OVERLAY 👇 */}
-      {/* It sits on top of everything when the user is downloading */}
-      <DownloadOverlay />
+      {/* 👇 2. WRAP THE OVERLAY IN SUSPENSE TO FIX THE BUILD ERROR 👇 */}
+      <Suspense fallback={null}>
+        <DownloadOverlay />
+      </Suspense>
 
     </main>
   );
